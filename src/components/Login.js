@@ -3,17 +3,14 @@ import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { loginUser } from "../actions";
 import { withStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
 import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import { InputAdornment } from '@material-ui/core';
 import { RemoveRedEye } from '@material-ui/icons';
-// import tree from "../images/tree.jpg"
+import { Paper, Button, Container, Typography, TextField, InputAdornment } from '@material-ui/core'
+import PersonIcon from '@material-ui/icons/Person';
+import LockIcon from '@material-ui/icons/Lock';
 import firebase from 'firebase'
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+
 const styles = () => ({
   "@global": {
     body: {
@@ -47,7 +44,6 @@ class Login extends Component {
     email: "", password: "", passwordhide: true
   };
 
-
   handleEmailChange = ({ target }) => {
     this.setState({ email: target.value });
   };
@@ -79,67 +75,61 @@ class Login extends Component {
       return <Redirect to="/" />;
     } else {
       return (
-        <div >
+        <div>
           <header className='navbar'>
-            <div className='navbar__title' style={{ fontSize: '35px', marginLeft: '30px' }}> TweetX</div>
+            <div className='navbar__title' style={{ fontSize: '35px', marginLeft: '30px' }}> NGK</div>
           </header>
-          <div style={{ float: 'left' }}>
+          <Container maxWidth='md'>
+            <Paper className={classes.paper} style={{ height: '450px' }}>
+              <div style={{ float: 'left' }}>
+                {/* <img src={"https://static.remove.bg/remove-bg-web/2a274ebbb5879d870a69caae33d94388a88e0e35/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg} alt="im"></img> */}
+                <Link href='/signup' style={{ textDecoration: 'underline' }}>
+                  <Typography component="h1" variant="h5" style={{ textAlign: 'center', marginTop: "20px" }} >
+                    Create an Account
+            </Typography>
+                </Link>
+              </div>
 
-            <div style={{ float: 'left' }} >
-
-              <Link href="/signup" variant="body2">
-                <Button
-                  type="button"
+              <div style={{ float: 'right' }}>
+                <Typography component="h1" variant="h5" >
+                  Login
+            </Typography>
+                <TextField
+                  margin="normal"
                   fullWidth
-                  variant="outlined"
-                  style={{ marginTop: '10px', marginLeft: '30px', borderRadius: '15px' }}
-
-                  color="default"
-                  className={classes.submit}
-
-                >
-                  Create Account
-            </Button>
-              </Link>
-              <Typography component="h1" variant="h5" style={{ textAlign: 'left', marginLeft: '30px', marginTop: '30px', fontSize: '40px' }}>
-                Login
-        </Typography>
-            </div>
-            <Container component="main" >
-              <div style={{ marginTop: '80px' }} >
-                {/* style={{ backgroundImage: `url(${imageUrl})` }} */}
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} style={{ marginTop: '10px' }}>
-                    <TextField
-                      margin="normal"
-                      id="filled-basic" variant="filled"
-                      style={{ width: 300 }}
-                      label="Email"
-                      name="email"
-                      onChange={this.handleEmailChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      margin="normal"
-                      id="filled-basic" variant="filled"
-                      name="password"
-                      style={{ width: 300 }}
-                      label="Password"
-                      type={this.state.passwordhide ? "password" : "text"}
-                      onChange={this.handlePasswordChange}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {this.state.passwordhide ? <RemoveRedEye onClick={this.togglePassword} style={{ cursor: 'pointer' }} /> : <VisibilityOffIcon onClick={this.togglePassword} style={{ cursor: 'pointer' }} />}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-
+                  id="input-with-icon-textfield"
+                  placeholder="Email Address"
+                  name="email"
+                  onChange={this.handleEmailChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="input-with-icon-textfield"
+                  name="password"
+                  type={this.state.passwordhide ? "password" : "text"}
+                  placeholder="Password"
+                  onChange={this.handlePasswordChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="start">
+                        {this.state.passwordhide ? <RemoveRedEye onClick={this.togglePassword} style={{ cursor: 'pointer' }} /> : <VisibilityOffIcon onClick={this.togglePassword} style={{ cursor: 'pointer' }} />}
+                      </InputAdornment>
+                    ),
+                  }}
+                />
                 {loginError && (
                   <Typography component="p" className={classes.errorText}>
                     Incorrect email or password.
@@ -148,30 +138,22 @@ class Login extends Component {
                 <Typography component="h6" variant="h6" onClick={this.handleForgot} style={{ cursor: 'pointer' }}>
                   Forgot Password ?
             </Typography>
-                <div style={{ float: 'center' }}>
-
-
-                  <Button
-                    type="button"
-                    fullWidth
-                    style={{ marginTop: '-20px', width: '100px', marginLeft: '195px' }}
-
-                    variant="contained"
-                    color="secondary"
-                    className={classes.submit}
-                    onClick={this.handleSubmit}
-                  >
-                    Login
+                <Button
+                  type="button"
+                  fullWidth
+                  variant="contained"
+                  style={{ width: '90px', marginTop: '40px' }}
+                  color="primary"
+                  className={classes.submit}
+                  onClick={this.handleSubmit}
+                >
+                  Log in
             </Button>
 
-                </div>
-
               </div>
+            </Paper>
 
-            </Container>
-          </div>
-
-
+          </Container>
         </div>
       );
     }

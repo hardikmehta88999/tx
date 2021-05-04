@@ -9,7 +9,6 @@ import Login from "./components/Login";
 import User from './components/User'
 import Profile from "./components/Profile";
 import Signup from './components/Signup';
-import OtherProfile from './components/OtherProfile'
 function App(props) {
   const { isAuthenticated, isVerifying } = props;
   return (
@@ -22,10 +21,15 @@ function App(props) {
         isAuthenticated={isAuthenticated}
         isVerifying={isVerifying}
       />
+      <ProtectedRoute
+        path="/editVehicle"
+        component={Home}
+        isAuthenticated={isAuthenticated}
+        isVerifying={isVerifying}
+      />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/user" component={User} />
-      <Route path="/userprofile" component={OtherProfile} />
       <ProtectedRoute
         exact
         path="/profile"

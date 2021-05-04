@@ -1,190 +1,229 @@
-import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import { Link } from 'react-router-dom';
+
+import React, { Component } from "react";
 import '../App.css'
-import Container from '@material-ui/core/Container';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import Slide from '@material-ui/core/Slide';
+import Button from "@material-ui/core/Button";
+import { Container, TextField } from "@material-ui/core";
 import firebase from '../firebase/firebase';
-import Avatar from '@material-ui/core/Avatar';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
+import { myFirebase } from "../firebase/firebase";
+import { Link } from 'react-router-dom';
+let path
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      InsuranceUpto: "",
+      FitnessUpto: '',
+      TaxUpto: '',
+      PollutionUpto: '',
+      VehicleNumber: "",
+      InsuranceCompany: "",
+      status: 'create'
 
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    position: 'relative',
-    color: 'secondary'
-  },
-  title: {
-    marginLeft: theme.spacing(2),
-    flex: 1,
-  },
-  root: {
-    maxWidth: 550,
-    marginTop: '30px'
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%',
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-  },
-  // avatar: {
-  //   backgroundColor: pink[500],
-  // },
-}));
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-function Home(props) {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const [description, setdescription] = React.useState('')
-  const [name, setname] = React.useState('')
-  const [image, setimage] = React.useState('')
-  const [post, setposts] = React.useState([])
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  useEffect(() => {
-    const id = firebase.auth().currentUser.uid;
-    firebase.firestore().collection('user').doc(id).onSnapshot(snap => {
-      setname(snap.data().name)
-      setimage(snap.data().image)
-      var following = []
-      following = (snap.data().following)
-      for (var i = 0; i < following.length; i++) {
-        var k = following[i]
-        firebase.firestore().collection('post').where('uid', '==', k).orderBy('timeStamp', 'desc').onSnapshot(snap => {
-          let arr = []
-          snap.forEach(value => {
-            arr.push(value.data())
-          })
-          setposts(arr)
+    };
+  }
+  componentDidMount() {
+    path = window.location.pathname.split('/');
+    if (path[2] !== undefined) {
+      firebase.firestore().collection("Vehicle").doc(path[2]).get().then(vehicle => {
+        this.setState({
+          InsuranceUpto: vehicle.data().InsuranceUpto,
+          FitnessUpto: vehicle.data().FitnessUpto,
+          TaxUpto: vehicle.data().TaxUpto,
+          PollutionUpto: vehicle.data().PollutionUpto,
+          VehicleNumber: vehicle.data().VehicleNumber,
+          InsuranceCompany: vehicle.data().InsuranceCompany,
+          status: 'update'
         })
-      }
-
-    })
-
-  }, []);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleShare = () => {
-    setOpen(false);
-    if (description.length > 0) {
-      const id = firebase.auth().currentUser.uid;
-      firebase.firestore().collection('post').add({
-        uid: id,
-        description: description,
-        name: name,
-        image: image,
-        timeStamp: new Date()
       })
     }
-
   }
-  console.clear()
 
-  return (
-    < div > <header className='navbar'>
-      <div className='navbar__title'> TweetX</div>
-      <div className='navbar__item'><Link to={'/'} style={{ textDecoration: 'none', color: 1 == 1 ? '#FF1493' : '#D3D3D3' }}>
-        Feed
-          </Link>{' '}</div>
-      <div className='navbar__item'><Link to="/user" style={{ textDecoration: 'none', color: window.location.pathname.split("/")[1] === 'user' ? '#FF1493' : '#D3D3D3' }}>Users</Link></div>
-      <div className='navbar__item'><Link to="/profile" style={{ textDecoration: 'none', color: window.location.pathname.split("/")[1] === 'profile' ? '#FF1493' : '#D3D3D3' }}>Profile</Link></div>
+  handleSubmit() {
+    if (this.state.status === "create") {
+      firebase.firestore().collection('Vehicle').doc(this.state.VehicleNumber).set({
+        InsuranceUpto: this.state.InsuranceUpto,
+        FitnessUpto: this.state.FitnessUpto,
+        TaxUpto: this.state.TaxUpto,
+        PollutionUpto: this.state.PollutionUpto,
+        VehicleNumber: this.state.VehicleNumber,
+        InsuranceCompany: this.state.InsuranceCompany,
+        'uid': myFirebase.auth().currentUser.uid,
+      }).then(() => {
+        alert("form filled")
+        window.location.reload()
+      }
+      )
+    }
+    else if (this.state.status === "update") {
+      firebase.firestore().collection('Vehicle').doc(path[2]).update({
+        InsuranceUpto: this.state.InsuranceUpto,
+        FitnessUpto: this.state.FitnessUpto,
+        TaxUpto: this.state.TaxUpto,
+        PollutionUpto: this.state.PollutionUpto,
+        VehicleNumber: this.state.VehicleNumber,
+        InsuranceCompany: this.state.InsuranceCompany,
+        'uid': myFirebase.auth().currentUser.uid,
+      }).then(() => {
+        alert("form updated")
+        window.location.reload()
+      }
+      )
 
+    }
+  }
 
-    </header>
-      <Container maxWidth="sm">
+  validateInput = (name, value) => {
+    if (value.length > 0) {
+      return null;
+    } else {
+      return <div style={{ fontSize: '15px', color: 'grey', float: 'right', marginTop: '-8px', fontWeight: '600' }}>* {name} is required</div>
+    }
+  }
 
-        <Button variant="contained" color="secondary" style={{ marginTop: '10px' }} onClick={() => handleClickOpen()}>
-          Write
-                     </Button>
-        <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
-          <AppBar className={classes.appBar}>
-            <Toolbar>
-              <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
-                <CloseIcon />
-              </IconButton>
-              <Typography variant="h6" className={classes.title}>
-                Write Something to Post
-            </Typography>
-              <Button autoFocus color="inherit" onClick={handleShare}>
-                Share
-            </Button>
-            </Toolbar>
-          </AppBar>
-          <TextareaAutosize
-            style={{ width: '100%', height: '200px' }}
+  validateDates = (name, value) => {
+    if (value.length > 0) {
+      return null;
+    }
+    else {
+      return <div style={{ fontSize: '15px', color: 'grey', float: 'right', marginTop: '-8px', fontWeight: '600' }}>*{name} are required</div>
+    }
+  }
+  getCurrentDate = () => {
+    const d = new Date();
+    return d.getYear() + 1900 + '-' + d.getMonth() + 1 + '-' + d.getDate();
+  }
+  setNextBtn = () => {
+    const impFields = ["InsuranceUpto", "FitnessUpto", "TaxUpto", "PollutionUpto", "VehicleNumber", "InsuranceCompany"];
+    const fieldsArray = impFields.map(i => this.state[i]);
+    if (fieldsArray.includes("")) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  render() {
+    console.log("this.state.status", this.state.status)
+    return (
+      <div>
+        <header className='navbar'>
+          <div className='navbar__title'> NGK</div>
+          <div className='navbar__item'>
+            {
+              this.state.status !== "update" ?
+                <Link to={'/'} style={{ textDecoration: 'none', color: 1 == 1 ? 'blue' : '#D3D3D3' }}>
+                  Form
+           </Link>
+                :
+                <Link style={{ textDecoration: 'none', color: 'blue' }}>
+                  Form
+              </Link>
+            }
+          </div>
+          <div className='navbar__item'><Link to="/user" style={{ textDecoration: 'none', color: window.location.pathname.split("/")[1] === 'user' ? 'blue' : '#D3D3D3' }}>Entries</Link></div>
+          <div className='navbar__item'><Link to="/profile" style={{ textDecoration: 'none', color: window.location.pathname.split("/")[1] === 'profile' ? 'blue' : '#D3D3D3' }}>Profile</Link></div>
+        </header>
+
+        <Container component="main" maxWidth="sm">
+          <TextField
             variant="outlined"
             margin="normal"
             fullWidth
-            name="description"
-            placeholder="Description"
-            type="textarea"
-            id="description"
-            value={description}
-            onChange={(e) => setdescription(e.target.value)}
+            id="VehicleNumber"
+            value={this.state.VehicleNumber}
+            disabled={this.state.status === "update" ? true : false}
+            label="Vehicle Number"
+            onChange={(e) => this.setState({ VehicleNumber: e.target.value })}
           />
-
-        </Dialog>
-        {post.map(data => {
-          return (
-            <Card className={classes.root}>
-              <CardHeader
-                avatar={
-                  <Avatar aria-label="recipe" >
-                    {data.name[0]}
-                  </Avatar>
-                }
-
-                title={data.name}
-              />
-              <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p" style={{ textAlign: 'center', marginLeft: '40px', marginTop: '-20px', marginRight: '20px' }}>
-                  {data.description.split(" ").splice(0, 30).join(" ")}
-                  <Avatar className={classes.avatar} style={{ marginTop: '-60px', marginLeft: '465px', backgroundColor: '#FFB6C1' }} >
-                  </Avatar>
-                </Typography>
-              </CardContent>
-            </Card>
-
-          )
-        })}
-
-      </Container>
-    </div >
-  );
+          {this.validateInput('Vehicle Number', this.state.VehicleNumber)}
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="InsuranceCompany"
+            value={this.state.InsuranceCompany}
+            label="Insurance Company"
+            onChange={(e) => this.setState({ InsuranceCompany: e.target.value })}
+          />
+          {this.validateInput('Insurance Company', this.state.InsuranceCompany)}
+          <TextField variant="outlined"
+            fullWidth
+            margin="normal"
+            id="date"
+            label="Insurance Upto"
+            type="date"
+            min="2019-06-02"
+            max="2019-06-08"
+            value={this.state.InsuranceUpto}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{ inputProps: { min: this.getCurrentDate() } }}
+            onChange={(e) => this.setState({ InsuranceUpto: e.target.value })}
+          />
+          {this.validateDates('Insurance Upto', this.state.InsuranceUpto)}
+          <TextField variant="outlined"
+            fullWidth
+            margin="normal"
+            id="Fitness Upto"
+            label="Fitness Upto"
+            value={this.state.FitnessUpto}
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{ inputProps: { min: this.getCurrentDate() } }}
+            onChange={(e) => this.setState({ FitnessUpto: e.target.value })}
+          />
+          {this.validateDates('Fitness Upto', this.state.FitnessUpto)}
+          <TextField variant="outlined"
+            fullWidth
+            display='block'
+            margin="normal"
+            id="date"
+            label="Tax Upto"
+            type="date"
+            min="2019-06-02"
+            max="2019-06-08"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={this.state.TaxUpto}
+            InputProps={{ inputProps: { min: this.getCurrentDate() } }}
+            onChange={(e) => this.setState({ TaxUpto: e.target.value })}
+          />
+          {this.validateDates('Tax Upto', this.state.TaxUpto)}
+          <TextField variant="outlined"
+            fullWidth
+            display='block'
+            margin="normal"
+            id="Pollution Upto"
+            label="Pollution Upto"
+            type="date"
+            value={this.state.PollutionUpto}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{ inputProps: { min: this.getCurrentDate() } }}
+            onChange={(e) => this.setState({ PollutionUpto: e.target.value })}
+          />
+          {this.validateDates('Pollution Upto', this.state.PollutionUpto)}
+          <div style={{ textAlign: 'center', marginTop: '20px', }}>
+            <Button
+              type="button"
+              style={{ width: '250px', backgroundColor: !this.setNextBtn() && 'blue', color: 'white' }}
+              disabled={this.setNextBtn()}
+              fullWidth
+              variant="contained"
+              onClick={() => this.handleSubmit()}
+            >
+              Submit
+            </Button>
+          </div>
+        </Container>
+      </div>
+    )
+  }
 }
-function mapStateToProps(state) {
-  return {
-    isLoggingOut: state.auth.isLoggingOut,
-    logoutError: state.auth.logoutError,
-    isAuthenticated: state.auth.isAuthenticated
 
-  };
-}
-
-export default connect(mapStateToProps)(Home)
+export default Home

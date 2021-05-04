@@ -1,10 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { myFirebase } from "../firebase/firebase";
@@ -12,6 +9,7 @@ import firebase from 'firebase'
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { withStyles } from "@material-ui/styles";
+import Paper from "@material-ui/core/Paper";
 
 const styles = () => ({
     "@global": {
@@ -42,6 +40,8 @@ const styles = () => ({
 });
 
 function Signup(props) {
+    const { classes } = props;
+
     const [value, setValue] = React.useState("");
     const [email, setemail] = React.useState("");
     const [password1, setpassword1] = React.useState("");
@@ -54,11 +54,8 @@ function Signup(props) {
                 let obj = { userUID: user.user.uid }
                 localStorage.setItem('isloggedin', JSON.stringify(obj))
                 firebase.firestore().collection('user').doc(user.user.uid).set({
-
                     email: email,
-                    followers: [],
                     name: value,
-                    following: [],
                     uid: user.user.uid,
                     image: "https://image.shutterstock.com/image-vector/people-vector-icon-260nw-378571234.jpg"
                 })
@@ -84,115 +81,90 @@ function Signup(props) {
     }
     else {
         return (
-            <div> <header className='navbar'>
-                <div className='navbar__title' style={{ fontSize: '35px', marginLeft: '30px' }}> TweetX</div>
-            </header>
-                <div style={{ float: 'left' }}>
-                    <div style={{ float: 'left' }}>
-                        <Link href="/login" variant="body2">
-                            <Button
-                                type="submit"
-                                style={{ marginTop: '10px', marginLeft: '30px', borderRadius: '15px' }}
+            <div>
+                <header className='navbar'>
+                    <div className='navbar__title' style={{ fontSize: '35px', marginLeft: '30px' }}> NGK</div>
+                </header>
+                <Container maxWidth='md'>
+                    <Paper className={classes.paper} style={{ height: '450px' }}>
+                        <div style={{ float: 'left' }}>
+                            <Link href='/login' style={{ textDecoration: 'underline' }}>
+                                <Typography component="h1" variant="h5" style={{ textAlign: 'center', marginTop: "20px" }} >
+                                    Go to login
+                                </Typography>
+                            </Link>
+                        </div>
+
+                        <div style={{ float: 'right' }}>
+                            <TextField
+                                margin="normal"
+                                autoComplete="fname"
+                                value={value}
+                                name="firstName"
                                 fullWidth
-                                variant="outlined"
-                                color="default"
-                            >
-                                Login
-          </Button>
-                        </Link>
-                        <Typography component="h1" variant="h5" style={{ textAlign: 'left', marginLeft: '30px', marginTop: '30px' }}>
-                            Create Account
-        </Typography>
-                    </div>
-                    <Container component="main" >
-                        <CssBaseline />
+                                label="Name"
+                                placeholder="Enter your Name"
+                                autoFocus
+                                onChange={(e) => setValue(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                value={email}
+                                label="Email"
+                                name="email"
+                                placeholder="Email"
+                                autoComplete="email"
+                                onChange={(e) => setemail(e.target.value)}
+                            />
 
-                        <div style={{ marginTop: '80px' }}>
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                value={password1}
+                                name="password"
+                                label="Password"
+                                type="password"
+                                placeholder="Password"
+                                onChange={(e) => setpassword1(e.target.value)}
+                                autoComplete="current-password"
+                                onKeyUp={(event) => {
+                                    if (event.key === 'Enter') { handleSummit() }
+                                }}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
 
-
-                            {/* <form className={classes.form} onSubmit={() => handleSummit()}> */}
-                            <Grid container spacing={2}>
-
-                                <Grid item xs={12} style={{ marginTop: '10px' }}>
-                                    <TextField
-                                        autoComplete="fname"
-                                        id="filled-basic" variant="filled"
-                                        value={value}
-                                        name="firstName"
-                                        style={{ width: 300 }}
-                                        fullWidth
-                                        label="Name"
-                                        placeholder="Enter your Name"
-                                        autoFocus
-                                        onChange={(e) => setValue(e.target.value)}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        id="filled-basic" variant="filled"
-                                        fullWidth
-                                        value={email}
-                                        style={{ width: 300 }}
-                                        label="Email"
-                                        name="email"
-                                        placeholder="Email"
-                                        autoComplete="email"
-                                        onChange={(e) => setemail(e.target.value)}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        id="filled-basic" variant="filled"
-                                        style={{ width: 300 }}
-                                        value={password1}
-                                        name="password"
-                                        label="Password"
-                                        type="password"
-                                        placeholder="Password"
-                                        onChange={(e) => setpassword1(e.target.value)}
-                                        autoComplete="current-password"
-                                        onKeyUp={(event) => {
-                                            if (event.key === 'Enter') { handleSummit() }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        id="filled-basic" variant="filled"
-                                        fullWidth
-                                        value={password2}
-                                        style={{ width: 300 }}
-                                        name="password"
-                                        label="Confirm Password"
-                                        type="password"
-                                        placeholder="Confirm Password"
-                                        onChange={(e) => setpassword2(e.target.value)}
-                                        autoComplete="current-password"
-                                        onKeyUp={(event) => {
-                                            if (event.key === 'Enter') { handleSummit() }
-                                        }}
-                                    /></Grid>
-                            </Grid>
+                                value={password2}
+                                name="password"
+                                label="Confirm Password"
+                                type="password"
+                                placeholder="Confirm Password"
+                                onChange={(e) => setpassword2(e.target.value)}
+                                autoComplete="current-password"
+                                onKeyUp={(event) => {
+                                    if (event.key === 'Enter') { handleSummit() }
+                                }}
+                            />
                             <div style={{ float: 'center' }}>
                                 <Button
-                                    type="submit"
-                                    style={{ marginTop: '10px', width: '100px', marginLeft: '190px' }}
+                                    type="button"
+                                    style={{ marginTop: '10px', width: '100px', }}
                                     fullWidth
-                                    variant="contained" color="secondary"
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.submit}
                                     onClick={() => {
                                         handlecheck()
                                     }}
                                 >
                                     Sign Up
-          </Button>
+                                </Button>
                             </div>
-
-                            {/* </form> */}
                         </div>
-                        <Box mt={5}>
-                        </Box>
-                    </Container >
-                </div >
+                    </Paper>
+                </Container>
             </div >
         );
     }
